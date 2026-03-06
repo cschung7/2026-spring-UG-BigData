@@ -1,0 +1,488 @@
+{
+  "metadata": {
+    "title": "거시경제학 예제 데이터",
+    "description": "거시경제학 학습을 위한 실제 경제 데이터와 예제 모음",
+    "created": "2026-03-06",
+    "version": "1.0",
+    "source": "한국은행, OECD, IMF 데이터 기반"
+  },
+  
+  "countries": {
+    "korea": {
+      "name": "대한민국",
+      "currency": "KRW",
+      "gdp_data": {
+        "2019": {
+          "nominal_gdp": 1924.7,
+          "real_gdp": 1844.9,
+          "gdp_growth_rate": 2.0,
+          "gdp_per_capita": 37062,
+          "components": {
+            "consumption": 961.4,
+            "investment": 576.8,
+            "government": 345.2,
+            "net_exports": 41.3
+          }
+        },
+        "2020": {
+          "nominal_gdp": 1940.7,
+          "real_gdp": 1828.8,
+          "gdp_growth_rate": -0.9,
+          "gdp_per_capita": 37458,
+          "components": {
+            "consumption": 945.2,
+            "investment": 562.1,
+            "government": 378.9,
+            "net_exports": 54.5
+          }
+        },
+        "2021": {
+          "nominal_gdp": 2071.7,
+          "real_gdp": 1904.3,
+          "gdp_growth_rate": 4.1,
+          "gdp_per_capita": 39901,
+          "components": {
+            "consumption": 982.7,
+            "investment": 601.4,
+            "government": 389.8,
+            "net_exports": 97.8
+          }
+        },
+        "2022": {
+          "nominal_gdp": 2181.5,
+          "real_gdp": 1962.7,
+          "gdp_growth_rate": 3.1,
+          "gdp_per_capita": 41960,
+          "components": {
+            "consumption": 1015.3,
+            "investment": 625.7,
+            "government": 398.2,
+            "net_exports": 142.3
+          }
+        },
+        "2023": {
+          "nominal_gdp": 2240.8,
+          "real_gdp": 2023.1,
+          "gdp_growth_rate": 3.1,
+          "gdp_per_capita": 43044,
+          "components": {
+            "consumption": 1042.1,
+            "investment": 645.9,
+            "government": 412.8,
+            "net_exports": 140.0
+          }
+        }
+      },
+      "inflation_data": {
+        "2019": 0.4,
+        "2020": 0.5,
+        "2021": 2.5,
+        "2022": 5.1,
+        "2023": 3.6,
+        "2024": 2.3
+      },
+      "unemployment_data": {
+        "2019": 3.8,
+        "2020": 4.0,
+        "2021": 3.6,
+        "2022": 2.9,
+        "2023": 3.1,
+        "2024": 3.2
+      },
+      "interest_rates": {
+        "2019": 1.25,
+        "2020": 0.50,
+        "2021": 1.00,
+        "2022": 3.25,
+        "2023": 3.50,
+        "2024": 3.25
+      }
+    },
+    
+    "usa": {
+      "name": "미국",
+      "currency": "USD",
+      "gdp_data": {
+        "2019": {
+          "nominal_gdp": 21427.7,
+          "real_gdp": 19036.6,
+          "gdp_growth_rate": 2.3,
+          "gdp_per_capita": 65297,
+          "components": {
+            "consumption": 14565.5,
+            "investment": 3750.4,
+            "government": 3374.4,
+            "net_exports": -862.6
+          }
+        },
+        "2023": {
+          "nominal_gdp": 27462.5,
+          "real_gdp": 21821.6,
+          "gdp_growth_rate": 2.5,
+          "gdp_per_capita": 81695,
+          "components": {
+            "consumption": 18563.8,
+            "investment": 4898.2,
+            "government": 4516.7,
+            "net_exports": -516.2
+          }
+        }
+      },
+      "inflation_data": {
+        "2019": 1.8,
+        "2020": 1.2,
+        "2021": 4.7,
+        "2022": 8.0,
+        "2023": 4.1,
+        "2024": 3.2
+      },
+      "unemployment_data": {
+        "2019": 3.7,
+        "2020": 8.1,
+        "2021": 5.4,
+        "2022": 3.6,
+        "2023": 3.7,
+        "2024": 4.1
+      }
+    }
+  },
+
+  "economic_indicators": {
+    "phillips_curve_data": [
+      {"year": 2019, "inflation": 0.4, "unemployment": 3.8},
+      {"year": 2020, "inflation": 0.5, "unemployment": 4.0},
+      {"year": 2021, "inflation": 2.5, "unemployment": 3.6},
+      {"year": 2022, "inflation": 5.1, "unemployment": 2.9},
+      {"year": 2023, "inflation": 3.6, "unemployment": 3.1}
+    ],
+    
+    "business_cycle": {
+      "phases": ["확장", "정점", "수축", "저점"],
+      "indicators": {
+        "expansion": {
+          "gdp_growth": "positive_increasing",
+          "unemployment": "decreasing", 
+          "inflation": "increasing",
+          "interest_rates": "rising"
+        },
+        "peak": {
+          "gdp_growth": "positive_but_slowing",
+          "unemployment": "lowest",
+          "inflation": "highest", 
+          "interest_rates": "highest"
+        },
+        "recession": {
+          "gdp_growth": "negative",
+          "unemployment": "increasing",
+          "inflation": "decreasing",
+          "interest_rates": "falling"
+        },
+        "trough": {
+          "gdp_growth": "negative_but_recovering",
+          "unemployment": "highest",
+          "inflation": "lowest",
+          "interest_rates": "lowest"
+        }
+      }
+    }
+  },
+
+  "calculation_examples": {
+    "gdp_calculation": {
+      "example_1": {
+        "title": "한국 2023년 GDP 계산",
+        "consumption": 1042.1,
+        "investment": 645.9,
+        "government": 412.8,
+        "net_exports": 140.0,
+        "result": 2240.8,
+        "formula": "GDP = C + I + G + (X - M)",
+        "calculation": "1042.1 + 645.9 + 412.8 + 140.0 = 2240.8 조원"
+      }
+    },
+    
+    "inflation_calculation": {
+      "example_1": {
+        "title": "2022년 한국 인플레이션율",
+        "current_price_index": 105.1,
+        "previous_price_index": 100.0,
+        "result": 5.1,
+        "formula": "인플레이션율 = ((P1 - P0) / P0) × 100",
+        "calculation": "((105.1 - 100.0) / 100.0) × 100 = 5.1%"
+      }
+    },
+    
+    "unemployment_calculation": {
+      "example_1": {
+        "title": "2023년 한국 실업률",
+        "unemployed": 858000,
+        "labor_force": 27662000,
+        "result": 3.1,
+        "formula": "실업률 = (실업자 수 / 경제활동인구) × 100",
+        "calculation": "(858000 / 27662000) × 100 = 3.1%"
+      }
+    },
+    
+    "multiplier_effect": {
+      "example_1": {
+        "title": "한국의 정부지출승수 (MPC = 0.75)",
+        "marginal_propensity_to_consume": 0.75,
+        "result": 4.0,
+        "formula": "승수 = 1 / (1 - MPC)",
+        "calculation": "1 / (1 - 0.75) = 1 / 0.25 = 4.0",
+        "interpretation": "정부지출 1조원 증가 시 국민소득 4조원 증가"
+      },
+      "example_2": {
+        "title": "조세승수 계산 (MPC = 0.8)", 
+        "marginal_propensity_to_consume": 0.8,
+        "result": -4.0,
+        "formula": "조세승수 = -MPC / (1 - MPC)",
+        "calculation": "-0.8 / (1 - 0.8) = -0.8 / 0.2 = -4.0",
+        "interpretation": "세금 1조원 증가 시 국민소득 4조원 감소"
+      }
+    },
+    
+    "real_gdp": {
+      "example_1": {
+        "title": "2023년 한국 실질GDP 계산",
+        "nominal_gdp": 2240.8,
+        "gdp_deflator": 110.8,
+        "base_year": 2015,
+        "result": 2023.1,
+        "formula": "실질GDP = (명목GDP / GDP디플레이터) × 100",
+        "calculation": "(2240.8 / 110.8) × 100 = 2023.1 조원"
+      }
+    },
+    
+    "present_value": {
+      "example_1": {
+        "title": "3년 후 1억원의 현재가치 (이자율 5%)",
+        "future_value": 100000000,
+        "discount_rate": 0.05,
+        "periods": 3,
+        "result": 86383760,
+        "formula": "PV = FV / (1 + r)^n",
+        "calculation": "100,000,000 / (1 + 0.05)^3 = 86,383,760 원"
+      }
+    }
+  },
+
+  "policy_scenarios": {
+    "fiscal_policy": {
+      "expansionary": {
+        "description": "경기침체 대응 확장적 재정정책",
+        "measures": [
+          "정부지출 증가",
+          "세율 인하", 
+          "공공투자 확대",
+          "사회보장 확대"
+        ],
+        "effects": {
+          "gdp": "+2.5%",
+          "unemployment": "-0.8%",
+          "inflation": "+0.5%",
+          "government_debt": "+5.2%"
+        },
+        "multiplier": 1.8,
+        "time_lag": "6-12개월"
+      },
+      "contractionary": {
+        "description": "인플레이션 억제 긴축적 재정정책",
+        "measures": [
+          "정부지출 감소",
+          "세율 인상",
+          "공공투자 축소"
+        ],
+        "effects": {
+          "gdp": "-1.2%",
+          "unemployment": "+0.5%", 
+          "inflation": "-0.8%",
+          "government_debt": "-2.1%"
+        },
+        "multiplier": 1.5,
+        "time_lag": "3-9개월"
+      }
+    },
+    
+    "monetary_policy": {
+      "expansionary": {
+        "description": "경기부양을 위한 확장적 통화정책",
+        "measures": [
+          "기준금리 인하",
+          "통화공급 증가",
+          "양적완화",
+          "대출규제 완화"
+        ],
+        "effects": {
+          "gdp": "+1.8%",
+          "unemployment": "-0.6%",
+          "inflation": "+0.7%",
+          "exchange_rate": "절하 5-8%"
+        },
+        "transmission_channels": [
+          "이자율 효과",
+          "환율 효과", 
+          "자산가격 효과",
+          "신용 효과"
+        ]
+      },
+      "contractionary": {
+        "description": "인플레이션 억제 긴축적 통화정책",
+        "measures": [
+          "기준금리 인상",
+          "통화공급 감소",
+          "대출규제 강화"
+        ],
+        "effects": {
+          "gdp": "-1.0%",
+          "unemployment": "+0.3%",
+          "inflation": "-1.2%",
+          "exchange_rate": "절상 3-6%"
+        }
+      }
+    }
+  },
+
+  "study_problems": {
+    "basic_calculations": [
+      {
+        "id": 1,
+        "type": "GDP계산",
+        "question": "한 국가의 2024년 경제지표가 다음과 같다. 민간소비: 800조원, 민간투자: 200조원, 정부지출: 180조원, 수출: 300조원, 수입: 250조원. GDP는?",
+        "given_data": {
+          "consumption": 800,
+          "investment": 200, 
+          "government": 180,
+          "exports": 300,
+          "imports": 250
+        },
+        "answer": 1230,
+        "solution": "GDP = C + I + G + (X - M) = 800 + 200 + 180 + (300 - 250) = 1230조원"
+      },
+      {
+        "id": 2,
+        "type": "인플레이션율",
+        "question": "2023년 소비자물가지수가 108.5, 2024년이 112.3이라면 2024년 인플레이션율은?",
+        "given_data": {
+          "cpi_2023": 108.5,
+          "cpi_2024": 112.3
+        },
+        "answer": 3.5,
+        "solution": "인플레이션율 = ((112.3 - 108.5) / 108.5) × 100 = 3.5%"
+      },
+      {
+        "id": 3,
+        "type": "실업률",
+        "question": "경제활동인구가 2,800만명이고 실업자가 98만명일 때 실업률은?",
+        "given_data": {
+          "labor_force": 28000000,
+          "unemployed": 980000
+        },
+        "answer": 3.5,
+        "solution": "실업률 = (980,000 / 28,000,000) × 100 = 3.5%"
+      },
+      {
+        "id": 4,
+        "type": "승수효과",
+        "question": "한계소비성향이 0.75일 때 정부가 20조원을 추가 지출하면 국민소득 증가는?",
+        "given_data": {
+          "mpc": 0.75,
+          "government_spending_increase": 20
+        },
+        "answer": 80,
+        "solution": "승수 = 1/(1-0.75) = 4, 국민소득 증가 = 20 × 4 = 80조원"
+      }
+    ],
+    
+    "advanced_problems": [
+      {
+        "id": 1,
+        "type": "IS-LM분석",
+        "question": "확장적 재정정책과 긴축적 통화정책을 동시에 실시할 때의 효과를 분석하시오.",
+        "concepts": ["IS곡선 이동", "LM곡선 이동", "균형점 변화"],
+        "answer": "GDP는 불확실, 이자율은 상승"
+      },
+      {
+        "id": 2, 
+        "type": "개방경제",
+        "question": "환율절하가 경제에 미치는 영향을 단기와 장기로 나누어 설명하시오.",
+        "concepts": ["J-curve 효과", "마셜-러너 조건", "물가효과"],
+        "answer": "단기: 무역수지 악화 가능, 장기: 무역수지 개선"
+      }
+    ]
+  },
+
+  "economic_models": {
+    "solow_growth_model": {
+      "parameters": {
+        "savings_rate": 0.25,
+        "depreciation_rate": 0.08,
+        "population_growth": 0.01,
+        "technology_growth": 0.02
+      },
+      "equations": {
+        "capital_accumulation": "dk/dt = s*f(k) - (δ + n + g)*k",
+        "steady_state": "k* = (s/(δ + n + g))^(1/(1-α))"
+      }
+    },
+    
+    "is_lm_model": {
+      "is_curve": {
+        "equation": "Y = C + I(r) + G",
+        "slope": "negative",
+        "shifts": ["정부지출", "세금", "투자심리", "소비성향"]
+      },
+      "lm_curve": {
+        "equation": "M/P = L(Y, r)",
+        "slope": "positive", 
+        "shifts": ["통화공급", "물가수준", "화폐수요"]
+      }
+    }
+  },
+
+  "current_events": {
+    "2024_korea_economy": {
+      "major_issues": [
+        "반도체 경기회복",
+        "부동산 시장 안정화",
+        "인플레이션 둔화",
+        "고용시장 개선"
+      ],
+      "policy_responses": [
+        "기준금리 동결",
+        "부동산 규제 완화",
+        "반도체 R&D 투자 확대"
+      ]
+    }
+  },
+
+  "formulas_reference": {
+    "gdp": {
+      "expenditure_approach": "GDP = C + I + G + (X - M)",
+      "income_approach": "GDP = 임금 + 이윤 + 이자 + 지대 + 간접세",
+      "real_gdp": "실질GDP = (명목GDP / GDP디플레이터) × 100"
+    },
+    "inflation": {
+      "rate": "인플레이션율 = ((P1 - P0) / P0) × 100",
+      "cpi": "CPI = (현재 장바구니 비용 / 기준연도 장바구니 비용) × 100"
+    },
+    "unemployment": {
+      "rate": "실업률 = (실업자 수 / 경제활동인구) × 100",
+      "participation_rate": "경제활동참가율 = (경제활동인구 / 생산가능인구) × 100"
+    },
+    "multipliers": {
+      "government_spending": "정부지출승수 = 1 / (1 - MPC)",
+      "tax": "조세승수 = -MPC / (1 - MPC)",
+      "balanced_budget": "균형예산승수 = 1"
+    },
+    "money": {
+      "quantity_equation": "MV = PY",
+      "fisher_equation": "명목이자율 = 실질이자율 + 기대인플레이션율"
+    },
+    "finance": {
+      "present_value": "PV = FV / (1 + r)^n",
+      "future_value": "FV = PV × (1 + r)^n",
+      "compound_interest": "A = P(1 + r)^t"
+    }
+  }
+}
