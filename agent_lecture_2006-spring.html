@@ -1,0 +1,467 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hermes Agent와 OpenClaw 비교 — AI × Finance</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Noto+Sans+KR:wght@400;500;700;900&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#06080f;
+    --ink:#e9edf7;
+    --muted:#7e8aa8;
+    --faint:#4a5572;
+    --line:rgba(255,255,255,.09);
+    --line2:rgba(255,255,255,.16);
+    --amber:#f5b942;
+    --cyan:#4fd6c4;
+    --blue:#6c8cff;
+    --rose:#ff7a8f;
+    --green:#6fe89a;
+    --panel:rgba(255,255,255,.035);
+    --panel2:rgba(255,255,255,.06);
+    --mono:"JetBrains Mono",ui-monospace,monospace;
+    --disp:"Space Grotesk","Noto Sans KR",sans-serif;
+    --body:"Noto Sans KR","Space Grotesk",sans-serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html,body{height:100%}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:var(--body);
+    overflow:hidden;
+    -webkit-font-smoothing:antialiased;
+  }
+  /* terminal grid backdrop */
+  body::before{
+    content:"";position:fixed;inset:0;z-index:0;pointer-events:none;
+    background:
+      radial-gradient(1100px 700px at 12% -10%,rgba(108,140,255,.16),transparent 60%),
+      radial-gradient(900px 600px at 100% 0%,rgba(79,214,196,.10),transparent 55%),
+      linear-gradient(rgba(255,255,255,.022) 1px,transparent 1px),
+      linear-gradient(90deg,rgba(255,255,255,.022) 1px,transparent 1px);
+    background-size:auto,auto,46px 46px,46px 46px;
+  }
+  .deck{position:relative;z-index:1;height:100vh;width:100vw;display:grid;grid-template-rows:54px 1fr 54px}
+
+  /* HEADER */
+  header{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:0 28px;border-bottom:1px solid var(--line);
+    background:rgba(6,8,15,.7);backdrop-filter:blur(10px);
+  }
+  .brand{display:flex;align-items:center;gap:12px;font-family:var(--mono);font-size:13px;letter-spacing:.04em;color:var(--muted)}
+  .brand .dot{width:9px;height:9px;border-radius:50%;background:var(--amber);box-shadow:0 0 12px var(--amber)}
+  .brand b{color:var(--ink);font-weight:600}
+  .brand .sep{color:var(--faint)}
+  .meta{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.05em}
+  .progress{position:absolute;left:0;right:0;top:54px;height:2px;background:rgba(255,255,255,.06);z-index:5}
+  .bar{height:100%;width:0;background:linear-gradient(90deg,var(--amber),var(--cyan));transition:width .35s ease}
+
+  /* SLIDES */
+  main{position:relative;overflow:hidden}
+  .slide{
+    position:absolute;inset:0;padding:48px 72px 40px;
+    opacity:0;transform:translateY(18px);transition:opacity .4s ease,transform .4s ease;
+    pointer-events:none;display:flex;flex-direction:column;justify-content:center;
+    overflow:auto;
+  }
+  .slide.active{opacity:1;transform:none;pointer-events:auto}
+
+  .kicker{font-family:var(--mono);font-size:12px;letter-spacing:.22em;text-transform:uppercase;color:var(--amber);margin-bottom:18px;display:flex;align-items:center;gap:10px}
+  .kicker::before{content:"";width:26px;height:1px;background:var(--amber)}
+
+  h1{font-family:var(--disp);font-weight:700;font-size:clamp(40px,5.4vw,68px);line-height:1.02;letter-spacing:-.035em;margin-bottom:22px}
+  h1 .accent{color:var(--amber)}
+  h2{font-family:var(--disp);font-weight:600;font-size:clamp(28px,3.6vw,44px);line-height:1.08;letter-spacing:-.028em;margin-bottom:26px}
+  h3{font-family:var(--disp);font-size:18px;font-weight:600;letter-spacing:-.01em;color:var(--cyan);margin-bottom:10px}
+  p,li{font-size:18px;line-height:1.6;color:#cdd5ea}
+  .lead{font-size:clamp(20px,2.2vw,26px);line-height:1.5;color:#e6ebf8;max-width:980px;font-weight:400}
+  .small{font-size:13px;color:var(--muted);font-family:var(--mono);letter-spacing:.02em}
+  b{color:#fff;font-weight:700}
+
+  .grid{display:grid;gap:16px}
+  .cols2{grid-template-columns:1fr 1fr}
+  .cols3{grid-template-columns:repeat(3,1fr)}
+
+  .card{
+    background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px 24px;
+    position:relative;transition:border-color .25s,transform .25s;
+  }
+  .card:hover{border-color:var(--line2);transform:translateY(-2px)}
+  .card ul{list-style:none;display:flex;flex-direction:column;gap:9px;margin-top:4px}
+  .card li{position:relative;padding-left:20px;font-size:16px;line-height:1.45}
+  .card li::before{content:"▸";position:absolute;left:0;color:var(--cyan);font-size:13px}
+
+  .pill{display:inline-flex;align-items:center;gap:6px;padding:6px 12px;border-radius:999px;
+    background:rgba(245,185,66,.1);border:1px solid rgba(245,185,66,.28);
+    color:var(--amber);font-family:var(--mono);font-weight:600;font-size:12px;letter-spacing:.04em;margin:4px 6px 0 0}
+
+  table{width:100%;border-collapse:collapse;font-size:15px;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+  th,td{padding:13px 18px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top;line-height:1.4}
+  th{font-family:var(--mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--cyan);background:rgba(79,214,196,.06)}
+  td{color:#d3dbef}
+  tr:last-child td{border-bottom:none}
+  td:first-child{color:#fff;font-weight:500}
+
+  .quote{font-family:var(--disp);font-size:clamp(22px,2.8vw,32px);line-height:1.32;font-weight:600;letter-spacing:-.02em;
+    padding:26px 30px;border-left:3px solid var(--amber);background:rgba(245,185,66,.05);border-radius:0 14px 14px 0;color:#f3f6ff}
+
+  .flow{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+  .node{padding:16px 18px;border-radius:14px;background:var(--panel2);border:1px solid var(--line2);
+    font-family:var(--disp);font-weight:600;font-size:15px;line-height:1.3}
+  .node .small{margin-top:3px}
+  .arrow{color:var(--amber);font-size:22px;font-family:var(--mono)}
+
+  .split{display:grid;grid-template-columns:1.05fr .95fr;gap:26px;align-items:start}
+  .kpi{font-family:var(--mono);font-size:clamp(20px,2.4vw,28px);font-weight:600;letter-spacing:-.01em}
+
+  .compare{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+  .hermes{border-color:rgba(79,214,196,.32)}
+  .hermes h3{color:var(--cyan)}
+  .openclaw{border-color:rgba(108,140,255,.36)}
+  .openclaw h3{color:var(--blue)}
+
+  .ghost{position:absolute;right:60px;bottom:34px;font-family:var(--mono);font-weight:600;
+    font-size:130px;line-height:1;color:rgba(255,255,255,.025);z-index:0;pointer-events:none;letter-spacing:-.04em}
+
+  /* TITLE slide */
+  .title-slide{justify-content:center}
+  .title-slide .lead{margin-top:8px}
+  .title-tags{margin-top:30px;display:flex;flex-wrap:wrap;gap:8px}
+
+  /* TOC */
+  .toc{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:6px}
+  .toc button{text-align:left;font-family:var(--mono);font-size:13px;color:var(--muted);
+    background:transparent;border:1px solid var(--line);border-radius:10px;padding:11px 13px;cursor:pointer;
+    transition:.2s;line-height:1.3}
+  .toc button:hover{color:var(--ink);border-color:var(--cyan);background:rgba(79,214,196,.06)}
+
+  /* FOOTER */
+  footer{display:flex;align-items:center;justify-content:space-between;padding:0 28px;
+    border-top:1px solid var(--line);background:rgba(6,8,15,.7);backdrop-filter:blur(10px)}
+  .nav{display:flex;gap:10px}
+  button.ctrl{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--ink);
+    background:var(--panel2);border:1px solid var(--line2);border-radius:10px;padding:8px 16px;cursor:pointer;transition:.2s;letter-spacing:.02em}
+  button.ctrl:hover{border-color:var(--amber);color:var(--amber);background:rgba(245,185,66,.08)}
+  #count{font-family:var(--mono);font-size:12px;color:var(--faint);letter-spacing:.08em}
+
+  @media(max-width:900px){
+    body{overflow:auto}
+    .deck{height:auto;min-height:100vh}
+    .slide{position:relative;opacity:1;transform:none;padding:34px 22px;display:none}
+    .slide.active{display:flex}
+    main{min-height:auto}
+    .cols2,.cols3,.split,.compare,.toc{grid-template-columns:1fr}
+    .ghost{display:none}
+    p,li{font-size:16px}
+  }
+</style>
+</head>
+<body>
+<div class="deck">
+  <header>
+    <div class="brand"><span class="dot"></span><b>AI Agent Lecture</b><span class="sep">//</span>Hermes × OpenClaw</div>
+    <div class="meta">AI × FINANCE · 2026</div>
+    <div class="progress"><div class="bar" id="bar"></div></div>
+  </header>
+
+  <main id="slides">
+
+    <!-- 01 TITLE (작성자/작성 카드 제거됨) -->
+    <section class="slide active title-slide">
+      <div class="ghost">01</div>
+      <div class="kicker">AI 금융 세미나</div>
+      <h1>Hermes Agent와<br><span class="accent">OpenClaw</span> 비교</h1>
+      <p class="lead">AI Agent는 더 똑똑한 챗봇이 아니다. LLM을 <b>기억·도구·실행·거버넌스</b>가 있는 업무 런타임으로 확장한 구조이다.</p>
+      <div class="title-tags">
+        <span class="pill">Memory</span><span class="pill">Tools</span><span class="pill">Execution</span><span class="pill">Governance</span>
+      </div>
+      <p class="small" style="margin-top:34px">키보드 ← → · 버튼 · 목차로 이동</p>
+    </section>
+
+    <!-- 02 -->
+    <section class="slide">
+      <div class="ghost">02</div>
+      <div class="kicker">Motivation</div>
+      <h2>왜 지금 Agent인가?</h2>
+      <div class="cols2 grid">
+        <div class="card"><h3>기존 LLM</h3><ul>
+          <li>질문에 답변을 생성</li><li>단발성 context 중심</li>
+          <li>기억과 실행 권한이 약함</li><li>사람이 계속 다음 지시를 내려야 함</li></ul></div>
+        <div class="card"><h3>Agent</h3><ul>
+          <li>목표를 작업으로 분해</li><li>도구를 호출하고 결과를 관찰</li>
+          <li>메모리와 상태를 유지</li><li>반복 업무를 스킬화</li></ul></div>
+      </div>
+      <div class="quote" style="margin-top:22px">LLM은 지식을 생성했고, Agent는 업무를 수행하기 시작했다.</div>
+    </section>
+
+    <!-- 03 -->
+    <section class="slide">
+      <div class="ghost">03</div>
+      <div class="kicker">Definition</div>
+      <h2>LLM ≠ AI Agent</h2>
+      <table>
+        <tr><th>구분</th><th>LLM</th><th>AI Agent</th></tr>
+        <tr><td>역할</td><td>텍스트 생성</td><td>목표 수행</td></tr>
+        <tr><td>기억</td><td>제한적 context</td><td>지속 memory</td></tr>
+        <tr><td>행동</td><td>응답 생성</td><td>도구 실행</td></tr>
+        <tr><td>시간</td><td>단발성</td><td>장기 실행</td></tr>
+        <tr><td>외부 연결</td><td>제한적</td><td>API · 브라우저 · 파일 · OS · 메시징</td></tr>
+      </table>
+    </section>
+
+    <!-- 04 -->
+    <section class="slide">
+      <div class="ghost">04</div>
+      <div class="kicker">Evolution</div>
+      <h2>Agent 발전 흐름</h2>
+      <div class="flow">
+        <div class="node">ReAct<div class="small">Reason + Act</div></div><div class="arrow">→</div>
+        <div class="node">AutoGPT / BabyAGI<div class="small">Autonomous loop</div></div><div class="arrow">→</div>
+        <div class="node">LangChain Agents<div class="small">Framework</div></div><div class="arrow">→</div>
+        <div class="node">LangGraph<div class="small">Stateful runtime</div></div><div class="arrow">→</div>
+        <div class="node">Hermes / OpenClaw<div class="small">Personal agent infra</div></div>
+      </div>
+      <div class="card" style="margin-top:24px"><p>핵심 전환은 “답변 생성”에서 <b>생각 → 행동 → 관찰 → 재계획</b> 루프로 넘어간 것이다.</p></div>
+    </section>
+
+    <!-- 05 -->
+    <section class="slide">
+      <div class="ghost">05</div>
+      <div class="kicker">Mental Model</div>
+      <h2>OS 비유로 이해하기</h2>
+      <table>
+        <tr><th>컴퓨터 OS</th><th>AI Agent OS</th></tr>
+        <tr><td>CPU</td><td>LLM</td></tr>
+        <tr><td>RAM</td><td>Context window</td></tr>
+        <tr><td>Disk</td><td>Persistent memory</td></tr>
+        <tr><td>Process scheduler</td><td>Agent orchestrator</td></tr>
+        <tr><td>Device driver</td><td>Tool / MCP</td></tr>
+        <tr><td>Background daemon</td><td>Scheduled agent</td></tr>
+        <tr><td>Permission system</td><td>Governance / RBAC</td></tr>
+      </table>
+    </section>
+
+    <!-- 06 -->
+    <section class="slide">
+      <div class="ghost">06</div>
+      <div class="kicker">Core Difference</div>
+      <h2>두 도구의 핵심 차이</h2>
+      <div class="compare">
+        <div class="card hermes"><h3>Hermes Agent</h3>
+          <div class="kpi" style="color:var(--cyan)">Learning-loop-first</div>
+          <p style="margin-top:10px">사용자의 반복 업무, 프로젝트 맥락, 선호를 기억하고 경험에서 스킬을 만들며 개선하는 자기개선형 에이전트 런타임.</p>
+          <div style="margin-top:6px"><span class="pill">Memory</span><span class="pill">Skills</span><span class="pill">Self-improvement</span></div></div>
+        <div class="card openclaw"><h3>OpenClaw</h3>
+          <div class="kpi" style="color:var(--blue)">Gateway-first</div>
+          <p style="margin-top:10px">여러 메시징 채널, 로컬 파일, 브라우저, 셸, 모델 제공자를 하나의 개인 AI 게이트웨이로 연결하는 구조.</p>
+          <div style="margin-top:6px"><span class="pill">Gateway</span><span class="pill">Local-first</span><span class="pill">Messaging</span></div></div>
+      </div>
+    </section>
+
+    <!-- 07 -->
+    <section class="slide">
+      <div class="ghost">07</div>
+      <div class="kicker">Deep Dive · Hermes</div>
+      <h2>Hermes Agent: 학습하는 에이전트</h2>
+      <div class="cols3 grid">
+        <div class="card"><h3>Persistent Memory</h3><p>세션을 넘어 사용자·프로젝트·작업 이력을 축적한다.</p></div>
+        <div class="card"><h3>Skill System</h3><p>반복 절차를 재사용 가능한 스킬로 저장하고 호출한다.</p></div>
+        <div class="card"><h3>Self-improving Loop</h3><p>경험에서 성공 패턴을 발견하고 실행 방식을 개선한다.</p></div>
+        <div class="card"><h3>Subagents</h3><p>복수 작업 흐름을 병렬화하거나 역할별로 분담한다.</p></div>
+        <div class="card"><h3>Scheduled Automation</h3><p>정기 보고서, 모니터링, 반복 체크를 예약 실행한다.</p></div>
+        <div class="card"><h3>MCP / Tools</h3><p>외부 도구와 데이터 소스를 연결해 실제 작업을 수행한다.</p></div>
+      </div>
+    </section>
+
+    <!-- 08 -->
+    <section class="slide">
+      <div class="ghost">08</div>
+      <div class="kicker">Deep Dive · OpenClaw</div>
+      <h2>OpenClaw: 로컬 우선 게이트웨이</h2>
+      <div class="cols3 grid">
+        <div class="card"><h3>Local-first</h3><p>사용자 장치나 서버에서 실행되며 파일과 세션을 직접 통제한다.</p></div>
+        <div class="card"><h3>Messaging Router</h3><p>Slack, Telegram, Discord 등 여러 채널을 하나로 묶는다.</p></div>
+        <div class="card"><h3>Model Agnostic</h3><p>OpenAI, Anthropic, Google, OpenRouter, Ollama 등 모델 선택 자유가 크다.</p></div>
+        <div class="card"><h3>Browser / Shell</h3><p>브라우저 자동화, 파일 처리, 셸 실행을 연결한다.</p></div>
+        <div class="card"><h3>Daemon Mode</h3><p>항상 켜져 있는 개인 비서처럼 운영할 수 있다.</p></div>
+        <div class="card"><h3>Explicit Control</h3><p>스킬, 라우팅, 설정을 사용자가 명시적으로 관리하기 쉽다.</p></div>
+      </div>
+    </section>
+
+    <!-- 09 -->
+    <section class="slide">
+      <div class="ghost">09</div>
+      <div class="kicker">Decision</div>
+      <h2>선택 기준</h2>
+      <table>
+        <tr><th>목적</th><th>추천</th><th>이유</th></tr>
+        <tr><td>반복 전문 업무를 장기 개선</td><td>Hermes Agent</td><td>경험 기반 스킬 생성과 사용자 모델링</td></tr>
+        <tr><td>다채널 개인 비서</td><td>OpenClaw</td><td>메시징 Gateway와 채널 라우팅</td></tr>
+        <tr><td>로컬 파일·브라우저·셸 연결</td><td>OpenClaw</td><td>local-first tool orchestration</td></tr>
+        <tr><td>자기개선형 에이전트 연구</td><td>Hermes Agent</td><td>learning loop와 skill refinement</td></tr>
+        <tr><td>기업·금융 적용</td><td>둘 다 신중</td><td>권한 · 감사 · 승인 · 샌드박스 필요</td></tr>
+      </table>
+    </section>
+
+    <!-- 10 -->
+    <section class="slide">
+      <div class="ghost">10</div>
+      <div class="kicker">Economics</div>
+      <h2>경제학 관점: Coase와 Agent</h2>
+      <div class="split">
+        <div>
+          <p class="lead">기업은 왜 존재하는가? 거래비용을 줄이기 위해서다. Agent는 정보 탐색, 보고, 조정, 커뮤니케이션 비용을 낮춘다.</p>
+          <div class="card" style="margin-top:18px"><h3>가능한 변화</h3><ul>
+            <li>더 작은 조직도 큰 조직 수준의 반복 분석 가능</li>
+            <li>middle coordination layer 일부 감소</li>
+            <li>AI-native firm의 등장</li>
+            <li>개인과 조직의 운영 레버리지 확대</li></ul></div>
+        </div>
+        <div class="card"><h3>경제적 효과</h3>
+          <p style="margin-top:8px"><b>정보비용 절감</b><br>공시, 뉴스, 리서치, 내부 문서 요약</p>
+          <p style="margin-top:14px"><b>거래비용 절감</b><br>보고, 승인, 커뮤니케이션 자동화</p>
+          <p style="margin-top:14px"><b>제한합리성 보완</b><br>다량 정보의 기억·검색·비교</p></div>
+      </div>
+    </section>
+
+    <!-- 11 -->
+    <section class="slide">
+      <div class="ghost">11</div>
+      <div class="kicker">Finance Application</div>
+      <h2>완전자율보다 감독형 자율성</h2>
+      <div class="flow">
+        <div class="node">시장 데이터</div><div class="arrow">→</div>
+        <div class="node">Agent<div class="small">수집·요약·분석</div></div><div class="arrow">→</div>
+        <div class="node">Governance Layer<div class="small">권한·검토</div></div><div class="arrow">→</div>
+        <div class="node">Human Approval</div><div class="arrow">→</div>
+        <div class="node">Execution</div>
+      </div>
+      <div class="quote" style="margin-top:24px">재무 관점에서 Agent는 완전한 자동 투자자가 아니라, bounded autonomy를 가진 보조 의사결정 시스템이다.</div>
+    </section>
+
+    <!-- 12 -->
+    <section class="slide">
+      <div class="ghost">12</div>
+      <div class="kicker">Use Cases</div>
+      <h2>금융·재무 응용사례</h2>
+      <div class="cols3 grid">
+        <div class="card"><h3>투자 리서치</h3><p>공시, 실적 발표, 뉴스, 산업 자료를 정기 요약.</p></div>
+        <div class="card"><h3>포트폴리오 감시</h3><p>보유 종목, 환율, 금리, 원자재, 신용 이벤트 모니터링.</p></div>
+        <div class="card"><h3>실적 발표 분석</h3><p>earnings call, 10-K/10-Q, IR 자료 비교.</p></div>
+        <div class="card"><h3>FP&amp;A</h3><p>예산 대비 실적, 비용 변동, KPI 변화 정리.</p></div>
+        <div class="card"><h3>감사·컴플라이언스</h3><p>문서 누락, 이상 거래, 규정 체크리스트 검토.</p></div>
+        <div class="card"><h3>KYC / AML 보조</h3><p>고객·거래처 문서와 공개 정보 정리.</p></div>
+      </div>
+    </section>
+
+    <!-- 13 -->
+    <section class="slide">
+      <div class="ghost">13</div>
+      <div class="kicker">Risk</div>
+      <h2>Agent 실패 유형</h2>
+      <table>
+        <tr><th>실패 유형</th><th>예시</th><th>대응</th></tr>
+        <tr><td>Hallucination</td><td>잘못된 재무 수치 생성</td><td>원천 데이터 인용, 계산 재검증</td></tr>
+        <tr><td>Tool misuse</td><td>잘못된 API 호출</td><td>도구 권한 제한, dry-run</td></tr>
+        <tr><td>Memory corruption</td><td>오래된 정보 기억</td><td>버전 관리, staleness check</td></tr>
+        <tr><td>Goal drift</td><td>원래 목표에서 이탈</td><td>작업 범위와 종료 조건 명시</td></tr>
+        <tr><td>Automation overreach</td><td>승인 없이 실행</td><td>human approval gate</td></tr>
+        <tr><td>Recursive loop</td><td>무한 반복</td><td>budget, timeout, audit log</td></tr>
+      </table>
+    </section>
+
+    <!-- 14 -->
+    <section class="slide">
+      <div class="ghost">14</div>
+      <div class="kicker">Key Takeaway</div>
+      <h2>핵심 메시지</h2>
+      <div class="quote">Agent 시대의 핵심 문제는 intelligence보다 governance이다.</div>
+      <div class="cols2 grid" style="margin-top:22px">
+        <div class="card hermes"><h3>Hermes의 의미</h3><p>개인의 기억, 절차, 스킬이 누적되는 학습형 업무 런타임.</p></div>
+        <div class="card openclaw"><h3>OpenClaw의 의미</h3><p>로컬 환경과 메시징 채널을 연결하는 개인 AI 조종석.</p></div>
+      </div>
+    </section>
+
+    <!-- 15 -->
+    <section class="slide">
+      <div class="ghost">15</div>
+      <div class="kicker">Discussion</div>
+      <h2>토론 질문</h2>
+      <div class="cols2 grid">
+        <div class="card"><h3>질문 1</h3><p>AI Agent가 기업의 거래비용을 낮춘다면, 기업 규모는 커질까 작아질까?</p></div>
+        <div class="card"><h3>질문 2</h3><p>금융기관에서 Agent에게 절대 주면 안 되는 권한은 무엇인가?</p></div>
+        <div class="card"><h3>질문 3</h3><p>Hermes의 자기개선은 생산성 향상인가, 통제 위험인가?</p></div>
+        <div class="card"><h3>질문 4</h3><p>OpenClaw 같은 local-first gateway는 개인정보 보호에 더 안전한가?</p></div>
+      </div>
+    </section>
+
+    <!-- 16 -->
+    <section class="slide">
+      <div class="ghost">16</div>
+      <div class="kicker">Conclusion</div>
+      <h2>결론</h2>
+      <p class="lead">Hermes와 OpenClaw는 경쟁 도구이기도 하지만, 실제로는 개인 AI 인프라의 두 방향을 보여준다.</p>
+      <div class="compare" style="margin-top:18px">
+        <div class="card hermes"><h3>Hermes Agent</h3><p>“에이전트가 시간이 지날수록 나를 더 잘 이해하고 반복 업무를 개선하길 원할 때.”</p></div>
+        <div class="card openclaw"><h3>OpenClaw</h3><p>“여러 채널과 로컬 도구를 연결한 강력한 개인 AI 조종석을 원할 때.”</p></div>
+      </div>
+      <div class="quote" style="margin-top:20px">AI Agent는 검색 엔진 → 모바일 → 클라우드 이후의 새로운 개인 컴퓨팅 패러다임 실험이다.</div>
+    </section>
+
+    <!-- 17 TOC -->
+    <section class="slide">
+      <div class="ghost">17</div>
+      <div class="kicker">Index</div>
+      <h2>목차 이동</h2>
+      <div class="toc" id="toc"></div>
+      <div class="card" style="margin-top:20px"><h3>자료 출처</h3>
+        <p class="small">Hermes Agent · OpenClaw · ReAct · LangGraph · IBM · CFA Institute · Anthropic · NBER 등 원 자료를 바탕으로 강의용으로 재구성.</p></div>
+    </section>
+
+  </main>
+
+  <footer>
+    <button class="ctrl" onclick="prev()">← 이전</button>
+    <span id="count">01 / 17</span>
+    <div class="nav">
+      <button class="ctrl" onclick="toggleOverview()">목차</button>
+      <button class="ctrl" onclick="next()">다음 →</button>
+    </div>
+  </footer>
+</div>
+
+<script>
+const slides=[...document.querySelectorAll('.slide')];let i=0;
+const pad=n=>String(n).padStart(2,'0');
+function show(n){
+  i=(n+slides.length)%slides.length;
+  slides.forEach((s,k)=>s.classList.toggle('active',k===i));
+  document.getElementById('count').textContent=`${pad(i+1)} / ${pad(slides.length)}`;
+  document.getElementById('bar').style.width=((i+1)/slides.length*100)+'%';
+  document.getElementById('slides').scrollTop=0;
+}
+function next(){show(i+1)} function prev(){show(i-1)}
+function toggleOverview(){show(slides.length-1)}
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'||e.key===' '){e.preventDefault();next()}
+  if(e.key==='ArrowLeft')prev();
+  if(e.key==='Home')show(0);
+  if(e.key==='End')show(slides.length-1);
+});
+const toc=document.getElementById('toc');
+slides.forEach((s,k)=>{
+  const t=s.querySelector('h1,h2')?.textContent||'Slide';
+  const b=document.createElement('button');
+  b.textContent=pad(k+1)+'  '+t;
+  b.onclick=()=>show(k);
+  toc.appendChild(b);
+});
+show(0);
+</script>
+</body>
+</html>
